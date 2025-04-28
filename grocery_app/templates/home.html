@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}QuickGrocer - Fresh Groceries Delivered in Minutes{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="banner mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <h1 class="display-5 fw-bold mb-3">Groceries delivered in <span class="text-primary">minutes</span>, not days</h1>
+                <p class="lead mb-4">Order fresh groceries, fruits, vegetables and more from QuickGrocer and get them delivered to your doorstep in minutes!</p>
+                <div class="d-flex">
+                    <a href="#categories" class="btn btn-primary px-4 py-2 me-3">Shop Now</a>
+                    <a href="#how-it-works" class="btn btn-outline-primary px-4 py-2">How it Works</a>
+                </div>
+            </div>
+            <div class="col-md-5 d-none d-md-block">
+                <img src="https://www.gardenoflife.com/media/2019/08/Fruits-and-Veggies-500x400.jpg" class="img-fluid rounded" alt="Fresh groceries">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Timer -->
+<div class="delivery-timer">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center">
+                <div class="timer-icon mb-2">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <h5 class="mb-1">Fast Delivery Promise</h5>
+                <p class="mb-0">Order now and get your groceries delivered within <strong>30 minutes</strong> in your area!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+<section id="categories" class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Shop by Categories</h2>
+        <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
+    </div>
+    
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'category_detail' category.slug %}" class="text-decoration-none">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        {% if category.name == "Fruits & Vegetables" %}
+                            <i class="fas fa-apple-alt category-icon"></i>
+                        {% elif category.name == "Dairy & Eggs" %}
+                            <i class="fas fa-cheese category-icon"></i>
+                        {% elif category.name == "Pantry Staples" %}
+                            <i class="fas fa-shopping-basket category-icon"></i>
+                        {% elif category.name == "Beverages" %}
+                            <i class="fas fa-coffee category-icon"></i>
+                        {% else %}
+                            <i class="fas fa-carrot category-icon"></i>
+                        {% endif %}
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text small text-muted">{{ category.description|truncatechars:50 }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No categories available at the moment.</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Featured Products</h2>
+        <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
+    </div>
+    
+    <div class="row g-4">
+        {% for product in featured_products %}
+        <div class="col-6 col-md-3">
+            <div class="card product-card h-100">
+                <div class="product-img-container">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/300" class="card-img-top" alt="{{ product.name }}">
+                    {% endif %}
+                    {% if product.price > 0 %}
+                    <span class="discount-badge">10% OFF</span>
+                    {% endif %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted small mb-1">{{ product.description|truncatechars:50 }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="fw-bold">₹{{ product.price }}</span>
+                        {% if product.stock > 10 %}
+                        <span class="in-stock small"><i class="fas fa-check-circle me-1"></i>In Stock</span>
+                        {% elif product.stock > 0 %}
+                        <span class="low-stock small"><i class="fas fa-exclamation-circle me-1"></i>Low Stock</span>
+                        {% else %}
+                        <span class="out-of-stock small"><i class="fas fa-times-circle me-1"></i>Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No featured products available at the moment.</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works" class="mb-5">
+    <h2 class="mb-4 text-center">How It Works</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 text-center">
+                <div class="card-body">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-mobile-alt text-primary fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">1. Browse & Order</h5>
+                    <p class="card-text">Select from a wide range of fresh groceries and essentials.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 text-center">
+                <div class="card-body">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-box text-primary fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">2. Rapid Packing</h5>
+                    <p class="card-text">Our team quickly packs your order with careful handling.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 text-center">
+                <div class="card-body">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-shipping-fast text-primary fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">3. Express Delivery</h5>
+                    <p class="card-text">Receive your groceries at your doorstep in minutes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Promotional Banner -->
+<section class="mb-5">
+    <div class="card bg-primary text-white">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="mb-3">Get 10% OFF on your first order!</h3>
+                    <p class="mb-md-0">Use code <strong>WELCOME10</strong> at checkout. Minimum order value ₹100.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="#" class="btn btn-light">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Testimonials -->
+<section>
+    <h2 class="mb-4 text-center">What Our Customers Say</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="card-text">"QuickGrocer has been a lifesaver! Fresh vegetables, quick delivery, and amazing service. Never going back to regular shopping!"</p>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Priya Sharma</h6>
+                            <small class="text-muted">Mumbai</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="card-text">"I'm impressed with the quality of fruits. Everything arrives fresh and the 30-minute delivery promise is always kept. Highly recommend!"</p>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Rahul Gupta</h6>
+                            <small class="text-muted">Pune</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="card-text">"Their app is super easy to use and their delivery is lightning fast. The quality of groceries is excellent. Best online grocery service!"</p>
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Neha Patel</h6>
+                            <small class="text-muted">Bangalore</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

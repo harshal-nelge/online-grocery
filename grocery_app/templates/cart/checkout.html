@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - QuickGrocer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-method-card {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .payment-method-card.selected {
+        border-color: var(--primary-color);
+        background-color: var(--accent-color);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'cart' %}">Cart</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">Checkout</h2>
+
+    <form id="checkout-form" method="post" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Shipping Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Delivery Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Delivery Address</label>
+                            <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <select class="form-select" id="state" name="state" required>
+                                    <option value="">Choose...</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="zipCode" class="form-label">Pin Code</label>
+                                <input type="text" class="form-control" id="zipCode" name="zipCode" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Slot -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Delivery Slot</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Select your preferred delivery time:</p>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check card p-3">
+                                    <input class="form-check-input" type="radio" name="deliverySlot" id="express" value="express" checked>
+                                    <label class="form-check-label w-100" for="express">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Express Delivery</strong></span>
+                                            <span class="badge bg-success">30 mins</span>
+                                        </div>
+                                        <small class="text-muted">Delivered within 30 minutes</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check card p-3">
+                                    <input class="form-check-input" type="radio" name="deliverySlot" id="scheduled" value="scheduled">
+                                    <label class="form-check-label w-100" for="scheduled">
+                                        <div class="d-flex justify-content-between">
+                                            <span><strong>Scheduled Delivery</strong></span>
+                                            <span class="badge bg-primary">Flexible</span>
+                                        </div>
+                                        <small class="text-muted">Choose your preferred time slot</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="scheduledOptions" class="mt-3" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="deliveryDate" class="form-label">Delivery Date</label>
+                                    <input type="date" class="form-control" id="deliveryDate" name="deliveryDate">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="deliveryTime" class="form-label">Time Slot</label>
+                                    <select class="form-select" id="deliveryTime" name="deliveryTime">
+                                        <option value="9AM-12PM">9 AM - 12 PM</option>
+                                        <option value="12PM-3PM">12 PM - 3 PM</option>
+                                        <option value="3PM-6PM">3 PM - 6 PM</option>
+                                        <option value="6PM-9PM">6 PM - 9 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Methods -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <div class="card payment-method-card selected" data-payment="PAYPAL">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="PAYPAL" checked>
+                                            <label class="form-check-label w-100" for="paypal">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fab fa-paypal text-primary me-2" style="font-size: 1.5rem;"></i>
+                                                    <span>PayPal</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card payment-method-card" data-payment="RAZORPAY">
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="payment_method" id="razorpay" value="RAZORPAY">
+                                            <label class="form-check-label w-100" for="razorpay">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-credit-card text-info me-2" style="font-size: 1.5rem;"></i>
+                                                    <span>Razorpay</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- COD option removed -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for item in cart_items %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                            <span>${{ item.total_price }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>${{ total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery Fee</span>
+                            <span>Free</span>
+                        </div>
+                        {% if discount_code %}
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount ({{ discount_code.discount_percent }}%)</span>
+                            <span>-${{ discount_amount }}</span>
+                        </div>
+                        {% endif %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold fs-5">${{ grand_total }}</span>
+                        </div>
+                        {% if active_discount_codes %}
+                        <div class="mb-3">
+                            <p class="mb-1">Available Discount Codes:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for code in active_discount_codes %}
+                                <span class="badge bg-success p-2">{{ code.code }} ({{ code.discount_percent }}% off)</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="d-grid">
+                            <button type="button" id="place-order-btn" class="btn btn-primary btn-lg">Place Order</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shield-alt text-primary me-3" style="font-size: 2rem;"></i>
+                            <div>
+                                <h6 class="mb-1">100% Secure Payments</h6>
+                                <p class="mb-0 small text-muted">All payment methods are encrypted and secure</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle scheduled delivery options
+    const expressRadio = document.getElementById('express');
+    const scheduledRadio = document.getElementById('scheduled');
+    const scheduledOptions = document.getElementById('scheduledOptions');
+    expressRadio.addEventListener('change', function() {
+        scheduledOptions.style.display = 'none';
+    });
+    scheduledRadio.addEventListener('change', function() {
+        scheduledOptions.style.display = 'block';
+    });
+
+    // Payment method selection
+    const paymentCards = document.querySelectorAll('.payment-method-card');
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    paymentCards.forEach(card => {
+        card.addEventListener('click', function() {
+            paymentCards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            const radioInput = this.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+                const event = new Event('change');
+                radioInput.dispatchEvent(event);
+            }
+        });
+    });
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            paymentCards.forEach(card => card.classList.remove('selected'));
+            const parentCard = this.closest('.payment-method-card');
+            if (parentCard) {
+                parentCard.classList.add('selected');
+            }
+        });
+    });
+
+    // Set minimum date for delivery to today
+    const deliveryDateInput = document.getElementById('deliveryDate');
+    if (deliveryDateInput) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        let mm = today.getMonth() + 1;
+        let dd = today.getDate();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        const formattedToday = yyyy + '-' + mm + '-' + dd;
+        deliveryDateInput.setAttribute('min', formattedToday);
+        deliveryDateInput.value = formattedToday;
+    }
+
+    // Handle form submission based on payment method
+    const checkoutForm = document.getElementById('checkout-form');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+
+    placeOrderBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        // Check which payment method is selected
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+        // Validate form fields
+        if (!checkoutForm.checkValidity()) {
+            checkoutForm.reportValidity();
+            return;
+        }
+
+        if (selectedPaymentMethod === 'RAZORPAY') {
+            // Gather form data
+            const formData = {
+                'firstName': document.getElementById('firstName').value,
+                'lastName': document.getElementById('lastName').value,
+                'email': document.getElementById('email').value,
+                'phone': document.getElementById('phone').value,
+                'address': document.getElementById('address').value,
+                'city': document.getElementById('city').value,
+                'state': document.getElementById('state').value,
+                'zipCode': document.getElementById('zipCode').value,
+                'deliverySlot': document.querySelector('input[name="deliverySlot"]:checked').value,
+                'payment_method': 'RAZORPAY'
+            };
+            if (formData['deliverySlot'] === 'scheduled') {
+                formData['deliveryDate'] = document.getElementById('deliveryDate').value;
+                formData['deliveryTime'] = document.getElementById('deliveryTime').value;
+            }
+
+            // AJAX POST to create Razorpay order
+            fetch("{% url 'checkout' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.method === 'razorpay') {
+                    // Open Razorpay modal
+                    var options = {
+                        "key": data.key_id,
+                        "amount": data.amount,
+                        "currency": data.currency,
+                        "name": data.name,
+                        "description": data.description,
+                        "order_id": data.order_id,
+                        "handler": function (response){
+                            // On successful payment, redirect to payment_success
+                            window.location.href = "{% url 'payment_success' %}";
+                        },
+                        "prefill": data.prefill,
+                        "theme": {
+                            "color": "#10b981"
+                        }
+                    };
+                    var rzp = new Razorpay(options);
+                    rzp.open();
+                } else if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(err => {
+                alert("Error initiating Razorpay payment.");
+            });
+        } else {
+            // Default to original form for PayPal
+            checkoutForm.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

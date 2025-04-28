@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - QuickGrocer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle text-primary" style="font-size: 5rem;"></i>
+                    </div>
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">Edit Profile</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    Account Actions
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i> Manage Addresses
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-credit-card me-2 text-primary"></i> Payment Methods
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2 text-primary"></i> Notification Settings
+                    </a>
+                    <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Order History</h5>
+                    <span class="badge bg-primary rounded-pill">{{ orders|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                        {% for order in orders %}
+                            <div class="card mb-3">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <span><strong>Order #{{ order.id }}</strong> - {{ order.created_at|date:"M d, Y" }}</span>
+                                    <span class="badge {% if order.status == 'DELIVERED' %}bg-success{% elif order.status == 'CANCELLED' %}bg-danger{% else %}bg-info{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6>Items</h6>
+                                            <ul class="list-unstyled">
+                                                {% for item in order.items.all %}
+                                                    <li>{{ item.quantity }}x {{ item.product.name }} - ${{ item.price }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <p><strong>Total:</strong> ${{ order.total_price }}</p>
+                                            <p><strong>Payment:</strong> {{ order.payment_method }}</p>
+                                            {% if order.status == 'DELIVERED' %}
+                                                <a href="#" class="btn btn-sm btn-outline-primary">Reorder</a>
+                                            {% elif order.status == 'PENDING' or order.status == 'PROCESSING' %}
+                                                <a href="#" class="btn btn-sm btn-outline-danger">Cancel</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-basket text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3">No Orders Yet</h5>
+                            <p class="text-muted">You haven't placed any orders yet.</p>
+                            <a href="{% url 'home' %}" class="btn btn-primary">Start Shopping</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
