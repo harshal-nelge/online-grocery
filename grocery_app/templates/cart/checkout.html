@@ -193,13 +193,13 @@
                         {% for item in cart_items %}
                         <div class="d-flex justify-content-between mb-2">
                             <span>{{ item.quantity }}x {{ item.product.name }}</span>
-                            <span>${{ item.total_price }}</span>
+                            <span>Rs{{ item.total_price }}</span>
                         </div>
                         {% endfor %}
                         <hr>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal</span>
-                            <span>${{ total }}</span>
+                            <span>Rs{{ total }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Delivery Fee</span>
@@ -208,13 +208,13 @@
                         {% if discount_code %}
                         <div class="d-flex justify-content-between mb-2 text-success">
                             <span>Discount ({{ discount_code.discount_percent }}%)</span>
-                            <span>-${{ discount_amount }}</span>
+                            <span>-Rs{{ discount_amount }}</span>
                         </div>
                         {% endif %}
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="fw-bold">Total</span>
-                            <span class="fw-bold fs-5">${{ grand_total }}</span>
+                            <span class="fw-bold fs-5">Rs{{ grand_total }}</span>
                         </div>
                         {% if active_discount_codes %}
                         <div class="mb-3">
