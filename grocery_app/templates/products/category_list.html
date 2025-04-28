@@ -25,17 +25,18 @@
                 </div>
                 <div class="col-md-4">
                     <div class="search-container">
-                        <form method="GET" action="{% url 'category_detail' category.slug %}">
+                        <form method="get" action="{% url 'category_detail' category.slug %}">
                             <div class="input-group">
                                 <span class="search-icon">
                                     <i class="fas fa-search"></i>
                                 </span>
-                                <input type="text" class="form-control" placeholder="Search in {{ category.name }}" 
-                                       name="search" value="{{ search_query }}">
+                                <input type="text" class="form-control" placeholder="Search in {{ category.name }}"
+                                       name="search" value="{{ search_query|default_if_none:'' }}">
                                 <button class="btn btn-primary" type="submit">Search</button>
                             </div>
                         </form>
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -46,42 +47,42 @@
         {% if products %}
             {% for product in products %}
                 <div class="col-6 col-md-4 col-lg-3 mb-4">
-                    <div class="card product-card h-100">
-                        <div class="product-img-container">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                            {% else %}
-                                <img src="https://via.placeholder.com/300x180?text=No+Image" class="card-img-top" alt="{{ product.name }}">
-                            {% endif %}
-                            
-                            <!-- Quick add to cart button -->
-                            <form action="{% url 'add_to_cart' product.id %}" method="POST" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="add-to-cart-btn">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </form>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none text-dark">
-                                    {{ product.name }}
-                                </a>
-                            </h6>
-                            <p class="card-text mb-1">
-                                <strong class="text-primary">Rs{{ product.price }}</strong>
-                            </p>
-                            <p class="card-text mb-0">
-                                {% if product.stock > 10 %}
-                                    <span class="in-stock"><i class="fas fa-check-circle me-1"></i>In Stock</span>
-                                {% elif product.stock > 0 %}
-                                    <span class="low-stock"><i class="fas fa-exclamation-circle me-1"></i>Low Stock ({{ product.stock }} left)</span>
+                    <a href="{% url 'product_detail' product.slug %}" class="text-decoration-none text-dark">
+                        <div class="card product-card h-100">
+                            <div class="product-img-container">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                                 {% else %}
-                                    <span class="out-of-stock"><i class="fas fa-times-circle me-1"></i>Out of Stock</span>
+                                    <img src="https://via.placeholder.com/300x180?text=No+Image" class="card-img-top" alt="{{ product.name }}">
                                 {% endif %}
-                            </p>
+                                
+                                <!-- Quick add to cart button -->
+                                <form action="{% url 'add_to_cart' product.id %}" method="POST" class="d-inline" onclick="event.stopPropagation();">
+                                    {% csrf_token %}
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    {{ product.name }}
+                                </h6>
+                                <p class="card-text mb-1">
+                                    <strong class="text-primary">Rs{{ product.price }}</strong>
+                                </p>
+                                <p class="card-text mb-0">
+                                    {% if product.stock > 10 %}
+                                        <span class="in-stock"><i class="fas fa-check-circle me-1"></i>In Stock</span>
+                                    {% elif product.stock > 0 %}
+                                        <span class="low-stock"><i class="fas fa-exclamation-circle me-1"></i>Low Stock ({{ product.stock }} left)</span>
+                                    {% else %}
+                                        <span class="out-of-stock"><i class="fas fa-times-circle me-1"></i>Out of Stock</span>
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             {% endfor %}
         {% else %}
